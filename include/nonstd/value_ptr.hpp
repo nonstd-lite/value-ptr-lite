@@ -1294,12 +1294,16 @@ namespace std
 template< class T, class D, class C >
 struct hash< nonstd::value_ptr<T, D, C> >
 {
-    typedef nonstd::value_ptr<T, D, C> argument_type;
+    typedef T      value_type;
     typedef size_t result_type;
+    typedef nonstd::value_ptr<T, D, C> argument_type;
 
     result_type operator()( argument_type const & p ) const nsvp_noexcept
     {
-        return hash<typename argument_type::const_pointer>()( p.get() );
+        if ( p.has_value() )
+            return hash<value_type>()( *p );
+
+        return static_cast<result_type>( -1 );
     }
 };
 

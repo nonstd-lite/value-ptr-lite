@@ -1175,10 +1175,19 @@ CASE( "std::hash<>: Allows to obtain hash (C++11)" )
 #if nsvp_CPP11_OR_GREATER
     value_ptr<int> a( 7 );
     value_ptr<int> b( 7 );
+    value_ptr<int> c( 9 );
+    value_ptr<int> z;
 
     EXPECT( std::hash<value_ptr<int> >()( a ) == std::hash<value_ptr<int> >()( a ) );
     EXPECT( std::hash<value_ptr<int> >()( b ) == std::hash<value_ptr<int> >()( b ) );
-    EXPECT( std::hash<value_ptr<int> >()( a ) != std::hash<value_ptr<int> >()( b ) );
+    EXPECT( std::hash<value_ptr<int> >()( a ) == std::hash<value_ptr<int> >()( b ) );
+
+    EXPECT( std::hash<value_ptr<int> >()( a ) != std::hash<value_ptr<int> >()( c ) );
+    EXPECT( std::hash<value_ptr<int> >()( b ) != std::hash<value_ptr<int> >()( c ) );
+
+    EXPECT( std::hash<value_ptr<int> >()( z ) == std::hash<value_ptr<int> >()( z ) );
+    EXPECT( std::hash<value_ptr<int> >()( a ) != std::hash<value_ptr<int> >()( z ) );
+    EXPECT( std::hash<value_ptr<int> >()( b ) != std::hash<value_ptr<int> >()( z ) );
 #else
     EXPECT( !!"std::hash<>: std::hash<> is not available (no C++11)" );
 #endif

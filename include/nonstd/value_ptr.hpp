@@ -175,6 +175,12 @@
 # define nsvp_constexpr14 /*constexpr*/
 #endif
 
+#if nsvp_HAVE_CONSTEXPR_20
+# define nsvp_constexpr20 constexpr
+#else
+# define nsvp_constexpr20 /*constexpr*/
+#endif
+
 #if nsvp_HAVE_NOEXCEPT
 # define nsvp_noexcept noexcept
 # define nsvp_noexcept_op noexcept
@@ -368,9 +374,9 @@ using std::default_delete;
 template< class T >
 struct default_delete
 {
-    default_delete() nsvp_noexcept {};
+    nsvp_constexpr default_delete() nsvp_noexcept {};
 
-    void operator()( T * ptr ) const nsvp_noexcept
+    nsvp_constexpr14 void operator()( T * ptr ) const nsvp_noexcept
     {
         nsvp_static_assert( sizeof(T) > 0, "default_delete cannot delete incomplete type");
 #if nsvp_CPP11_OR_GREATER
@@ -387,10 +393,10 @@ struct default_clone
 #if nsvp_CPP11_OR_GREATER
     default_clone() = default;
 #else
-    default_clone() {};
+    nsvp_constexpr default_clone() {};
 #endif
 
-    T * operator()( T const & x ) const
+    nsvp_constexpr T * operator()( T const & x ) const
     {
         nsvp_static_assert( sizeof(T) > 0, "default_clone cannot clone incomplete type");
 #if nsvp_CPP11_OR_GREATER
@@ -400,19 +406,19 @@ struct default_clone
     }
 
 #if nsvp_CPP11_OR_GREATER
-    T * operator()( T && x ) const
+    nsvp_constexpr T * operator()( T && x ) const
     {
         return new T( std::move( x ) );
     }
 
     template< class... Args >
-    T * operator()( nonstd_lite_in_place_t(T), Args&&... args ) const
+    nsvp_constexpr T * operator()( nonstd_lite_in_place_t(T), Args&&... args ) const
     {
         return new T( std::forward<Args>(args)...);
     }
 
     template< class U, class... Args >
-    T * operator()( nonstd_lite_in_place_t(T), std::initializer_list<U> il, Args&&... args ) const
+    nsvp_constexpr T * operator()( nonstd_lite_in_place_t(T), std::initializer_list<U> il, Args&&... args ) const
     {
         return new T( il, std::forward<Args>(args)...);
     }
@@ -430,27 +436,27 @@ struct nsvp_DECLSPEC_EMPTY_BASES compressed_ptr : Cloner, Deleter
 
     // Lifetime:
 
-    ~compressed_ptr()
+    nsvp_constexpr20 ~compressed_ptr()
     {
         deleter_type()( ptr );
     }
 
-    compressed_ptr() nsvp_noexcept
+    nsvp_constexpr compressed_ptr() nsvp_noexcept
     : ptr( nsvp_nullptr )
     {}
 
-    compressed_ptr( pointer p ) nsvp_noexcept
+    nsvp_constexpr compressed_ptr( pointer p ) nsvp_noexcept
     : ptr( p )
     {}
 
-    compressed_ptr( compressed_ptr const & other )
+    nsvp_constexpr compressed_ptr( compressed_ptr const & other )
     : cloner_type ( other )
     , deleter_type( other )
     , ptr( other.ptr ? cloner_type()( *other.ptr ) : nsvp_nullptr )
     {}
 
 #if  nsvp_CPP11_OR_GREATER
-    compressed_ptr( compressed_ptr && other ) nsvp_noexcept
+    nsvp_constexpr14 compressed_ptr( compressed_ptr && other ) nsvp_noexcept
     : cloner_type ( std::move( other ) )
     , deleter_type( std::move( other ) )
     , ptr( std::move( other.ptr ) )
@@ -459,86 +465,86 @@ struct nsvp_DECLSPEC_EMPTY_BASES compressed_ptr : Cloner, Deleter
     }
 #endif
 
-    compressed_ptr( element_type const & value )
+    nsvp_constexpr compressed_ptr( element_type const & value )
     : ptr( cloner_type()( value ) )
     {}
 
 #if  nsvp_CPP11_OR_GREATER
 
-    compressed_ptr( element_type && value ) nsvp_noexcept
+    nsvp_constexpr compressed_ptr( element_type && value ) nsvp_noexcept
     : ptr( cloner_type()( std::move( value ) ) )
     {}
 
     template< class... Args >
-    explicit compressed_ptr( nonstd_lite_in_place_t(T), Args&&... args )
+    explicit nsvp_constexpr compressed_ptr( nonstd_lite_in_place_t(T), Args&&... args )
     : ptr( cloner_type()( nonstd_lite_in_place(T), std::forward<Args>(args)...) )
     {}
 
     template< class U, class... Args >
-    explicit compressed_ptr( nonstd_lite_in_place_t(T), std::initializer_list<U> il, Args&&... args )
+    explicit nsvp_constexpr compressed_ptr( nonstd_lite_in_place_t(T), std::initializer_list<U> il, Args&&... args )
     : ptr( cloner_type()( nonstd_lite_in_place(T), il, std::forward<Args>(args)...) )
     {}
 
 #endif
 
-    compressed_ptr( element_type const & value, cloner_type const & cloner )
+    nsvp_constexpr compressed_ptr( element_type const & value, cloner_type const & cloner )
     : cloner_type ( cloner  )
     , ptr( cloner_type()( value ) )
     {}
 
 #if  nsvp_CPP11_OR_GREATER
-    compressed_ptr( element_type && value, cloner_type && cloner ) nsvp_noexcept
+    nsvp_constexpr compressed_ptr( element_type && value, cloner_type && cloner ) nsvp_noexcept
     : cloner_type ( std::move( cloner  ) )
     , ptr( cloner_type()( std::move( value ) ) )
     {}
 #endif
 
-    compressed_ptr( element_type const & value, cloner_type const & cloner, deleter_type const & deleter )
+    nsvp_constexpr compressed_ptr( element_type const & value, cloner_type const & cloner, deleter_type const & deleter )
     : cloner_type ( cloner  )
     , deleter_type( deleter )
     , ptr( cloner_type()( value ) )
     {}
 
 #if  nsvp_CPP11_OR_GREATER
-    compressed_ptr( element_type && value, cloner_type && cloner, deleter_type && deleter ) nsvp_noexcept
+    nsvp_constexpr compressed_ptr( element_type && value, cloner_type && cloner, deleter_type && deleter ) nsvp_noexcept
     : cloner_type ( std::move( cloner  ) )
     , deleter_type( std::move( deleter ) )
     , ptr( cloner_type()( std::move( value ) ) )
     {}
 #endif
 
-    compressed_ptr( cloner_type const & cloner )
+    nsvp_constexpr compressed_ptr( cloner_type const & cloner )
     : cloner_type( cloner )
     , ptr( nsvp_nullptr )
     {}
 
 #if  nsvp_CPP11_OR_GREATER
-    compressed_ptr( cloner_type && cloner ) nsvp_noexcept
+    nsvp_constexpr compressed_ptr( cloner_type && cloner ) nsvp_noexcept
     : cloner_type( std::move( cloner ) )
     , ptr( nsvp_nullptr )
     {}
 #endif
 
-    compressed_ptr( deleter_type const & deleter )
+    nsvp_constexpr compressed_ptr( deleter_type const & deleter )
     : deleter_type( deleter )
     , ptr( nsvp_nullptr )
     {}
 
 # if  nsvp_CPP11_OR_GREATER
-    compressed_ptr( deleter_type && deleter ) nsvp_noexcept
+    nsvp_constexpr compressed_ptr( deleter_type && deleter ) nsvp_noexcept
     : deleter_type( std::move( deleter ) )
     , ptr( nsvp_nullptr )
     {}
 #endif
 
-    compressed_ptr( cloner_type const & cloner, deleter_type const & deleter )
+    nsvp_constexpr compressed_ptr( cloner_type const & cloner, deleter_type const & deleter )
     : cloner_type ( cloner  )
     , deleter_type( deleter )
     , ptr( nsvp_nullptr )
     {}
 
 #if  nsvp_CPP11_OR_GREATER
-    compressed_ptr( cloner_type && cloner, deleter_type && deleter ) nsvp_noexcept
+    nsvp_constexpr compressed_ptr( cloner_type && cloner, deleter_type && deleter ) nsvp_noexcept
     : cloner_type ( std::move( cloner  ) )
     , deleter_type( std::move( deleter ) )
     , ptr( nsvp_nullptr )
@@ -547,24 +553,24 @@ struct nsvp_DECLSPEC_EMPTY_BASES compressed_ptr : Cloner, Deleter
 
     // Observers:
 
-    pointer get() const nsvp_noexcept
+    nsvp_constexpr pointer get() const nsvp_noexcept
     {
         return ptr;
     }
 
-    cloner_type & get_cloner() nsvp_noexcept
+    nsvp_constexpr14 cloner_type & get_cloner() nsvp_noexcept
     {
         return *this;
     }
 
-    deleter_type & get_deleter() nsvp_noexcept
+    nsvp_constexpr14 deleter_type & get_deleter() nsvp_noexcept
     {
         return *this;
     }
 
     // Modifiers:
 
-    pointer release() nsvp_noexcept
+    nsvp_constexpr14 pointer release() nsvp_noexcept
     {
         using std::swap;
         pointer result = nsvp_nullptr;
@@ -572,25 +578,25 @@ struct nsvp_DECLSPEC_EMPTY_BASES compressed_ptr : Cloner, Deleter
         return result;
     }
 
-    void reset( pointer p ) nsvp_noexcept
+    nsvp_constexpr14 void reset( pointer p ) nsvp_noexcept
     {
         get_deleter()( ptr );
         ptr = p;
     }
 
-    void reset( element_type const & v )
+    nsvp_constexpr14 void reset( element_type const & v )
     {
         reset( get_cloner()( v ) );
     }
 
 #if  nsvp_CPP11_OR_GREATER
-    void reset( element_type && v )
+    nsvp_constexpr14 void reset( element_type && v )
     {
         reset( get_cloner()( std::move( v ) ) );
     }
 #endif
 
-    void swap( compressed_ptr & other ) nsvp_noexcept
+    nsvp_constexpr14 void swap( compressed_ptr & other ) nsvp_noexcept
     {
         using std::swap;
         swap( ptr, other.ptr );
@@ -609,7 +615,7 @@ class bad_value_access : public std::logic_error
 {
 public:
     explicit bad_value_access()
-    : logic_error( "bad value_ptr access" ) {}
+    : std::logic_error( "bad value_ptr access" ) {}
 };
 
 #endif
@@ -637,40 +643,40 @@ public:
     // Lifetime
 
 #if nsvp_HAVE_IS_DEFAULT
-    ~value_ptr() = default;
+    nsvp_constexpr20 ~value_ptr() = default;
 #endif
 
-    value_ptr() nsvp_noexcept
+    nsvp_constexpr value_ptr() nsvp_noexcept
     : ptr( cloner_type(), deleter_type() )
     {}
 
 #if nsvp_HAVE_NULLPTR
-    value_ptr( std::nullptr_t ) nsvp_noexcept
+    nsvp_constexpr value_ptr( std::nullptr_t ) nsvp_noexcept
     : ptr( cloner_type(), deleter_type() )
     {}
 #endif
 
-    value_ptr( pointer p ) nsvp_noexcept
+    nsvp_constexpr value_ptr( pointer p ) nsvp_noexcept
     : ptr( p )
     {}
 
-    value_ptr( value_ptr const & other )
+    nsvp_constexpr value_ptr( value_ptr const & other )
     : ptr( other.ptr )
     {}
 
 #if nsvp_CPP11_OR_GREATER
-    value_ptr( value_ptr && other ) nsvp_noexcept
+    nsvp_constexpr value_ptr( value_ptr && other ) nsvp_noexcept
     : ptr( std::move( other.ptr ) )
     {}
 #endif
 
-    value_ptr( element_type const & value )
+    nsvp_constexpr value_ptr( element_type const & value )
     : ptr( value )
     {}
 
 #if nsvp_CPP11_OR_GREATER
 
-    value_ptr( element_type && value ) nsvp_noexcept
+    nsvp_constexpr value_ptr( element_type && value ) nsvp_noexcept
     : ptr( std::move( value ) )
     {}
 
@@ -678,7 +684,7 @@ public:
         nsvp_REQUIRES_T(
             std::is_constructible<T, Args&&...>::value )
     >
-    explicit value_ptr( nonstd_lite_in_place_t(T), Args&&... args )
+    explicit nsvp_constexpr value_ptr( nonstd_lite_in_place_t(T), Args&&... args )
     : ptr( nonstd_lite_in_place(T), std::forward<Args>(args)...)
     {}
 
@@ -686,28 +692,28 @@ public:
         nsvp_REQUIRES_T(
             std::is_constructible<T, std::initializer_list<U>&, Args&&...>::value )
     >
-    explicit value_ptr( nonstd_lite_in_place_t(T), std::initializer_list<U> il, Args&&... args )
+    explicit nsvp_constexpr value_ptr( nonstd_lite_in_place_t(T), std::initializer_list<U> il, Args&&... args )
     : ptr( nonstd_lite_in_place(T), il, std::forward<Args>(args)...)
     {}
 
 #endif // nsvp_CPP11_OR_GREATER
 
-    value_ptr( cloner_type const & cloner )
+    nsvp_constexpr value_ptr( cloner_type const & cloner )
     : ptr( cloner )
     {}
 
 #if  nsvp_CPP11_OR_GREATER
-    value_ptr( cloner_type && cloner ) nsvp_noexcept
+    nsvp_constexpr value_ptr( cloner_type && cloner ) nsvp_noexcept
     : ptr( std::move( cloner ) )
     {}
 #endif
 
-    value_ptr( deleter_type const & deleter )
+    nsvp_constexpr value_ptr( deleter_type const & deleter )
     : ptr( deleter )
     {}
 
 #if  nsvp_CPP11_OR_GREATER
-    value_ptr( deleter_type && deleter ) nsvp_noexcept
+    nsvp_constexpr value_ptr( deleter_type && deleter ) nsvp_noexcept
     : ptr( std::move( deleter ) )
     {}
 #endif
@@ -717,12 +723,12 @@ public:
         nsvp_REQUIRES_T(
             !std::is_same<typename std20::remove_cvref<V>::type, nonstd_lite_in_place_t(V)>::value )
     >
-    value_ptr( V && value, ClonerOrDeleter && cloner_or_deleter )
+    nsvp_constexpr value_ptr( V && value, ClonerOrDeleter && cloner_or_deleter )
     : ptr( std::forward<V>( value ), std::forward<ClonerOrDeleter>( cloner_or_deleter ) )
     {}
 #else
     template< class V, class ClonerOrDeleter >
-    value_ptr( V const & value, ClonerOrDeleter const & cloner_or_deleter )
+    nsvp_constexpr value_ptr( V const & value, ClonerOrDeleter const & cloner_or_deleter )
     : ptr( value, cloner_or_deleter )
     {}
 #endif
@@ -732,7 +738,7 @@ public:
         nsvp_REQUIRES_T(
             !std::is_same<typename std20::remove_cvref<V>::type, nonstd_lite_in_place_t(V)>::value )
     >
-    value_ptr( V && value, C && cloner, D && deleter )
+    nsvp_constexpr value_ptr( V && value, C && cloner, D && deleter )
     : ptr( std::forward<V>( value ), std::forward<C>( cloner ), std::forward<D>( deleter ) )
     {}
 #else
@@ -743,14 +749,14 @@ public:
 #endif
 
 #if nsvp_HAVE_NULLPTR
-    value_ptr & operator=( std::nullptr_t ) nsvp_noexcept
+    nsvp_constexpr14 value_ptr & operator=( std::nullptr_t ) nsvp_noexcept
     {
         ptr.reset( nullptr );
         return *this;
     }
 #endif
 
-    value_ptr & operator=( T const & value )
+    nsvp_constexpr14 value_ptr & operator=( T const & value )
     {
         ptr.reset( value );
         return *this;
@@ -761,14 +767,14 @@ public:
         nsvp_REQUIRES_T(
             std::is_same< typename std::decay<U>::type, T>::value )
     >
-    value_ptr & operator=( U && value )
+    nsvp_constexpr14 value_ptr & operator=( U && value )
     {
         ptr.reset( std::forward<U>( value ) );
         return *this;
     }
 #endif
 
-    value_ptr & operator=( value_ptr const & rhs )
+    nsvp_constexpr14 value_ptr & operator=( value_ptr const & rhs )
     {
         if ( this == &rhs )
             return *this;
@@ -784,7 +790,7 @@ public:
 
 #if  nsvp_CPP11_OR_GREATER
 
-    value_ptr & operator=( value_ptr && rhs ) nsvp_noexcept
+    nsvp_constexpr14 value_ptr & operator=( value_ptr && rhs ) nsvp_noexcept
     {
         if ( this == &rhs )
             return *this;
@@ -795,13 +801,13 @@ public:
     }
 
     template< class... Args >
-    void emplace( Args&&... args )
+    nsvp_constexpr14 void emplace( Args&&... args )
     {
         ptr.reset( T( std::forward<Args>(args)...) );
     }
 
     template< class U, class... Args >
-    void emplace( std::initializer_list<U> il, Args&&... args )
+    nsvp_constexpr14 void emplace( std::initializer_list<U> il, Args&&... args )
     {
         ptr.reset( T( il, std::forward<Args>(args)...) );
     }
@@ -810,33 +816,33 @@ public:
 
     // Observers:
 
-    pointer get() const nsvp_noexcept
+    nsvp_constexpr pointer get() const nsvp_noexcept
     {
         return ptr.get();
     }
 
-    cloner_type & get_cloner() nsvp_noexcept
+    nsvp_constexpr14 cloner_type & get_cloner() nsvp_noexcept
     {
         return ptr.get_cloner();
     }
 
-    deleter_type & get_deleter() nsvp_noexcept
+    nsvp_constexpr14 deleter_type & get_deleter() nsvp_noexcept
     {
         return ptr.get_deleter();
     }
 
-    reference operator*() const
+    nsvp_constexpr reference operator*() const
     {
         assert( get() != nsvp_nullptr ); return *get();
     }
 
-    pointer operator->() const nsvp_noexcept
+    nsvp_constexpr pointer operator->() const nsvp_noexcept
     {
         assert( get() != nsvp_nullptr ); return get();
     }
 
 #if  nsvp_CPP11_OR_GREATER
-    explicit operator bool() const nsvp_noexcept
+    explicit nsvp_constexpr operator bool() const nsvp_noexcept
     {
         return has_value();
     }
@@ -846,18 +852,18 @@ private:
     void this_type_does_not_support_comparisons() const {}
 
 public:
-    operator safe_bool() const nsvp_noexcept
+    nsvp_constexpr operator safe_bool() const nsvp_noexcept
     {
         return has_value() ? &value_ptr::this_type_does_not_support_comparisons : 0;
     }
 #endif
 
-    bool has_value() const nsvp_noexcept
+    nsvp_constexpr bool has_value() const nsvp_noexcept
     {
         return !! get();
     }
 
-    element_type const & value() const
+    nsvp_constexpr14 element_type const & value() const
     {
 #if nsvp_CONFIG_NO_EXCEPTIONS
         assert( has_value() );
@@ -870,7 +876,7 @@ public:
         return *get();
     }
 
-    element_type & value()
+    nsvp_constexpr14 element_type & value()
     {
 #if nsvp_CONFIG_NO_EXCEPTIONS
         assert( has_value() );
@@ -886,7 +892,7 @@ public:
 #if nsvp_CPP11_OR_GREATER
 
     template< class U >
-    element_type value_or( U && v ) const
+    nsvp_constexpr element_type value_or( U && v ) const
     {
         return has_value() ? value() : static_cast<element_type>(std::forward<U>( v ) );
     }
@@ -894,7 +900,7 @@ public:
 #else
 
     template< class U >
-    element_type value_or( U const & v ) const
+    nsvp_constexpr element_type value_or( U const & v ) const
     {
         return has_value() ? value() : static_cast<element_type>( v );
     }
@@ -903,17 +909,17 @@ public:
 
     // Modifiers:
 
-    pointer release() nsvp_noexcept
+    nsvp_constexpr14 pointer release() nsvp_noexcept
     {
         return ptr.release();
     }
 
-    void reset( pointer p = pointer() ) nsvp_noexcept
+    nsvp_constexpr14 void reset( pointer p = pointer() ) nsvp_noexcept
     {
         ptr.reset( p );
     }
 
-    void swap( value_ptr & other ) nsvp_noexcept
+    nsvp_constexpr14 void swap( value_ptr & other ) nsvp_noexcept
     {
         ptr.swap( other.ptr );
     }
@@ -927,19 +933,19 @@ private:
 #if nsvp_CPP11_OR_GREATER
 
 template< class T >
-inline value_ptr< typename std::decay<T>::type > make_value( T && v )
+inline nsvp_constexpr value_ptr< typename std::decay<T>::type > make_value( T && v )
 {
     return value_ptr< typename std::decay<T>::type >( std::forward<T>( v ) );
 }
 
 template< class T, class... Args >
-inline value_ptr<T> make_value( Args&&... args )
+inline nsvp_constexpr value_ptr<T> make_value( Args&&... args )
 {
     return value_ptr<T>( in_place, std::forward<Args>(args)...);
 }
 
 template< class T, class U, class... Args >
-inline value_ptr<T> make_value( std::initializer_list<U> il, Args&&... args )
+inline nsvp_constexpr value_ptr<T> make_value( std::initializer_list<U> il, Args&&... args )
 {
     return value_ptr<T>( in_place, il, std::forward<Args>(args)...);
 }
@@ -964,7 +970,7 @@ template<
     class T1, class D1, class C1,
     class T2, class D2, class C2
 >
-inline bool operator==(
+inline nsvp_constexpr bool operator==(
     value_ptr<T1, D1, C1> const & lhs,
     value_ptr<T2, D2, C2> const & rhs )
 {
@@ -975,7 +981,7 @@ template<
     class T1, class D1, class C1,
     class T2, class D2, class C2
 >
-inline bool operator!=(
+inline nsvp_constexpr bool operator!=(
     value_ptr<T1, D1, C1> const & lhs,
     value_ptr<T2, D2, C2> const & rhs )
 {
@@ -986,7 +992,7 @@ template<
     class T1, class D1, class C1,
     class T2, class D2, class C2
 >
-inline bool operator<(
+inline nsvp_constexpr bool operator<(
     value_ptr<T1, D1, C1> const & lhs,
     value_ptr<T2, D2, C2> const & rhs )
 {
@@ -1004,7 +1010,7 @@ template<
     class T1, class D1, class C1,
     class T2, class D2, class C2
 >
-inline bool operator<=(
+inline nsvp_constexpr bool operator<=(
     value_ptr<T1, D1, C1> const & lhs,
     value_ptr<T2, D2, C2> const & rhs )
 {
@@ -1015,7 +1021,7 @@ template<
     class T1, class D1, class C1,
     class T2, class D2, class C2
 >
-inline bool operator>(
+inline nsvp_constexpr bool operator>(
     value_ptr<T1, D1, C1> const & lhs,
     value_ptr<T2, D2, C2> const & rhs )
 {
@@ -1026,7 +1032,7 @@ template<
     class T1, class D1, class C1,
     class T2, class D2, class C2
 >
-inline bool operator>=(
+inline nsvp_constexpr bool operator>=(
     value_ptr<T1, D1, C1> const & lhs,
     value_ptr<T2, D2, C2> const & rhs )
 {
@@ -1038,75 +1044,75 @@ inline bool operator>=(
 #if nsvp_HAVE_NULLPTR
 
 template< class T, class D, class C  >
-inline bool operator==( value_ptr<T, D, C> const & lhs, std::nullptr_t ) nsvp_noexcept
+inline nsvp_constexpr bool operator==( value_ptr<T, D, C> const & lhs, std::nullptr_t ) nsvp_noexcept
 {
     return ! lhs;
 }
 
 template< class T, class D, class C  >
-inline bool operator==( std::nullptr_t, value_ptr<T, D, C> const & rhs ) nsvp_noexcept
+inline nsvp_constexpr bool operator==( std::nullptr_t, value_ptr<T, D, C> const & rhs ) nsvp_noexcept
 {
     return ! rhs;
 }
 
 template< class T, class D, class C  >
-inline bool operator!=( value_ptr<T, D, C> const & lhs, std::nullptr_t ) nsvp_noexcept
+inline nsvp_constexpr bool operator!=( value_ptr<T, D, C> const & lhs, std::nullptr_t ) nsvp_noexcept
 {
     return static_cast<bool>( lhs );
 }
 
 template< class T, class D, class C  >
-inline bool operator!=( std::nullptr_t, value_ptr<T, D, C> const & rhs ) nsvp_noexcept
+inline nsvp_constexpr bool operator!=( std::nullptr_t, value_ptr<T, D, C> const & rhs ) nsvp_noexcept
 {
     return static_cast<bool>( rhs );
 }
 
 template< class T, class D, class C  >
-inline bool operator<( value_ptr<T, D, C> const & lhs, std::nullptr_t )
+inline nsvp_constexpr bool operator<( value_ptr<T, D, C> const & lhs, std::nullptr_t )
 {
     typedef typename value_ptr<T, D, C>::const_pointer P;
     return std::less<P>()( lhs.get(), nullptr );
 }
 
 template< class T, class D, class C  >
-inline bool operator<( std::nullptr_t, value_ptr<T, D, C> const & rhs )
+inline nsvp_constexpr bool operator<( std::nullptr_t, value_ptr<T, D, C> const & rhs )
 {
     typedef typename value_ptr<T, D, C>::const_pointer P;
     return std::less<P>()( nullptr, rhs.get() );
 }
 
 template< class T, class D, class C  >
-inline bool operator<=( value_ptr<T, D, C> const & lhs, std::nullptr_t )
+inline nsvp_constexpr bool operator<=( value_ptr<T, D, C> const & lhs, std::nullptr_t )
 {
     return !( nullptr < lhs );
 }
 
 template< class T, class D, class C  >
-inline bool operator<=( std::nullptr_t, value_ptr<T, D, C> const & rhs )
+inline nsvp_constexpr bool operator<=( std::nullptr_t, value_ptr<T, D, C> const & rhs )
 {
     return !( rhs < nullptr );
 }
 
 template< class T, class D, class C  >
-inline bool operator>( value_ptr<T, D, C> const & lhs, std::nullptr_t )
+inline nsvp_constexpr bool operator>( value_ptr<T, D, C> const & lhs, std::nullptr_t )
 {
     return nullptr < lhs;
 }
 
 template< class T, class D, class C  >
-inline bool operator>( std::nullptr_t, value_ptr<T, D, C> const & rhs )
+inline nsvp_constexpr bool operator>( std::nullptr_t, value_ptr<T, D, C> const & rhs )
 {
     return rhs < nullptr;
 }
 
 template< class T, class D, class C  >
-inline bool operator>=( value_ptr<T, D, C> const & lhs, std::nullptr_t )
+inline nsvp_constexpr bool operator>=( value_ptr<T, D, C> const & lhs, std::nullptr_t )
 {
     return !( lhs < nullptr );
 }
 
 template< class T, class D, class C  >
-inline bool operator>=( std::nullptr_t, value_ptr<T, D, C> const & rhs )
+inline nsvp_constexpr bool operator>=( std::nullptr_t, value_ptr<T, D, C> const & rhs )
 {
     return !( nullptr < rhs );
 }
@@ -1121,7 +1127,7 @@ template<
     class T1, class D1, class C1,
     class T2, class D2, class C2
 >
-inline bool operator==(
+inline nsvp_constexpr bool operator==(
     value_ptr<T1, D1, C1> const & lhs,
     value_ptr<T2, D2, C2> const & rhs )
 {
@@ -1132,7 +1138,7 @@ template<
     class T1, class D1, class C1,
     class T2, class D2, class C2
 >
-inline bool operator!=(
+inline nsvp_constexpr bool operator!=(
     value_ptr<T1, D1, C1> const & lhs,
     value_ptr<T2, D2, C2> const & rhs )
 {
@@ -1143,7 +1149,7 @@ template<
     class T1, class D1, class C1,
     class T2, class D2, class C2
 >
-inline bool operator<(
+inline nsvp_constexpr bool operator<(
     value_ptr<T1, D1, C1> const & lhs,
     value_ptr<T2, D2, C2> const & rhs )
 {
@@ -1163,7 +1169,7 @@ template<
     class T1, class D1, class C1,
     class T2, class D2, class C2
 >
-inline bool operator<=(
+inline nsvp_constexpr bool operator<=(
     value_ptr<T1, D1, C1> const & lhs,
     value_ptr<T2, D2, C2> const & rhs )
 {
@@ -1174,7 +1180,7 @@ template<
     class T1, class D1, class C1,
     class T2, class D2, class C2
 >
-inline bool operator>(
+inline nsvp_constexpr bool operator>(
     value_ptr<T1, D1, C1> const & lhs,
     value_ptr<T2, D2, C2> const & rhs )
 {
@@ -1185,7 +1191,7 @@ template<
     class T1, class D1, class C1,
     class T2, class D2, class C2
 >
-inline bool operator>=(
+inline nsvp_constexpr bool operator>=(
     value_ptr<T1, D1, C1> const & lhs,
     value_ptr<T2, D2, C2> const & rhs )
 {
@@ -1195,73 +1201,73 @@ inline bool operator>=(
 // compare with value:
 
 template< class T, class C, class D >
-bool operator==( value_ptr<T,C,D> const & vp, T const & value )
+nsvp_constexpr bool operator==( value_ptr<T,C,D> const & vp, T const & value )
 {
     return bool(vp) ? *vp == value : false;
 }
 
 template< class T, class C, class D >
-bool operator==( T const & value, value_ptr<T,C,D> const & vp )
+nsvp_constexpr bool operator==( T const & value, value_ptr<T,C,D> const & vp )
 {
     return bool(vp) ? value == *vp : false;
 }
 
 template< class T, class C, class D >
-bool operator!=( value_ptr<T,C,D> const & vp, T const & value )
+nsvp_constexpr bool operator!=( value_ptr<T,C,D> const & vp, T const & value )
 {
     return bool(vp) ? *vp != value : true;
 }
 
 template< class T, class C, class D >
-bool operator!=( T const & value, value_ptr<T,C,D> const & vp )
+nsvp_constexpr bool operator!=( T const & value, value_ptr<T,C,D> const & vp )
 {
     return bool(vp) ? value != *vp : true;
 }
 
 template< class T, class C, class D >
-bool operator<( value_ptr<T,C,D> const & vp, T const & value )
+nsvp_constexpr bool operator<( value_ptr<T,C,D> const & vp, T const & value )
 {
     return bool(vp) ? *vp < value : true;
 }
 
 template< class T, class C, class D >
-bool operator<( T const & value, value_ptr<T,C,D> const & vp )
+nsvp_constexpr bool operator<( T const & value, value_ptr<T,C,D> const & vp )
 {
     return bool(vp) ? value < *vp : false;
 }
 
 template< class T, class C, class D >
-bool operator<=( value_ptr<T,C,D> const & vp, T const & value )
+nsvp_constexpr bool operator<=( value_ptr<T,C,D> const & vp, T const & value )
 {
     return bool(vp) ? *vp <= value : true;
 }
 
 template< class T, class C, class D >
-bool operator<=( T const & value, value_ptr<T,C,D> const & vp )
+nsvp_constexpr bool operator<=( T const & value, value_ptr<T,C,D> const & vp )
 {
     return bool(vp) ? value <= *vp : false;
 }
 
 template< class T, class C, class D >
-bool operator>( value_ptr<T,C,D> const & vp, T const & value )
+nsvp_constexpr bool operator>( value_ptr<T,C,D> const & vp, T const & value )
 {
     return bool(vp) ? *vp > value : false;
 }
 
 template< class T, class C, class D >
-bool operator>( T const & value, value_ptr<T,C,D> const & vp )
+nsvp_constexpr bool operator>( T const & value, value_ptr<T,C,D> const & vp )
 {
     return bool(vp) ? value > *vp : true;
 }
 
 template< class T, class C, class D >
-bool operator>=( value_ptr<T,C,D> const & vp, T const & value )
+nsvp_constexpr bool operator>=( value_ptr<T,C,D> const & vp, T const & value )
 {
     return bool(vp) ? *vp >= value : false;
 }
 
 template< class T, class C, class D >
-bool operator>=( T const & value, value_ptr<T,C,D> const & vp )
+nsvp_constexpr bool operator>=( T const & value, value_ptr<T,C,D> const & vp )
 {
     return bool(vp) ? value >= *vp : true;
 }
@@ -1271,7 +1277,7 @@ bool operator>=( T const & value, value_ptr<T,C,D> const & vp )
 // swap:
 
 template< class T, class D, class C >
-inline void swap(
+inline nsvp_constexpr14 void swap(
     value_ptr<T, D, C> & lhs,
     value_ptr<T, D, C> & rhs ) nsvp_noexcept
 {
@@ -1298,12 +1304,11 @@ struct hash< nonstd::value_ptr<T, D, C> >
     typedef size_t result_type;
     typedef nonstd::value_ptr<T, D, C> argument_type;
 
-    result_type operator()( argument_type const & p ) const nsvp_noexcept
+    nsvp_constexpr result_type operator()( argument_type const & p ) const nsvp_noexcept
     {
-        if ( p.has_value() )
-            return hash<value_type>()( *p );
-
-        return static_cast<result_type>( -1 );
+        return p.has_value() ?
+            hash<value_type>()( *p ) :
+            static_cast<result_type>( -1 );
     }
 };
 

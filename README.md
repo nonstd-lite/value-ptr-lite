@@ -6,16 +6,30 @@
 
 
 **Contents**
-- [Example usage](#example-usage)
-- [In a nutshell](#in-a-nutshell)
-- [Dependencies](#dependencies)
-- [Installation](#installation)
-- [Synopsis](#synopsis)
-- [Reported to work with](#reported-to-work-with)
-- [Building tests and examples](#building-tests-and-examples)
-- [Other value_ptr implementations](#other-value-ptr-implementations)
-- [Notes and references](#notes-and-references)
-- [Appendix](#appendix)
+- [value-ptr lite: A C++ smart-pointer with value semantics for C++98, C++11 and later](#value-ptr-lite-a-c-smart-pointer-with-value-semantics-for-c98-c11-and-later)
+  - [Pimpl example usage](#pimpl-example-usage)
+  - [In a nutshell](#in-a-nutshell)
+  - [License](#license)
+  - [Dependencies](#dependencies)
+  - [Installation](#installation)
+  - [Synopsis](#synopsis)
+    - [Types in namespace nonstd](#types-in-namespace-nonstd)
+    - [Interface of *value-ptr lite*](#interface-of-value-ptr-lite)
+      - [Class `value_ptr`](#class-value_ptr)
+    - [Non-member functions for *value-ptr lite*](#non-member-functions-for-value-ptr-lite)
+    - [Configuration macros](#configuration-macros)
+      - [Standard selection macro](#standard-selection-macro)
+      - [Compare pointers](#compare-pointers)
+      - [Disable exceptions](#disable-exceptions)
+  - [Reported to work with](#reported-to-work-with)
+  - [Building tests and examples](#building-tests-and-examples)
+    - [Buck](#buck)
+    - [CMake](#cmake)
+  - [Other value-ptr implementations](#other-value-ptr-implementations)
+  - [Notes and references](#notes-and-references)
+  - [Appendix](#appendix)
+    - [A.1 Compile-time information](#a1-compile-time-information)
+    - [A.2 Value-ptr lite test specification](#a2-value-ptr-lite-test-specification)
 
 
 Pimpl example usage
@@ -335,4 +349,5 @@ make_value: Allows to in-place move-construct value_ptr from arguments (C++11)
 make_value: Allows to in-place copy-construct value_ptr from initializer-list and arguments (C++11)
 make_value: Allows to in-place move-construct value_ptr from initializer-list and arguments (C++11)
 std::hash<>: Allows to obtain hash (C++11)
+tweak header: reads tweak header if supported [tweak]
 ```

@@ -20,6 +20,16 @@
 #define nsvp_STRINGIFY(  x )  nsvp_STRINGIFY_( x )
 #define nsvp_STRINGIFY_( x )  #x
 
+// tweak header support:
+
+#if defined(__has_include) && __has_include(<nonstd/value_ptr.tweak.hpp>)
+# include <nonstd/value_ptr.tweak.hpp>
+# define nsvp_HAVE_TWEAK_HEADER  1
+#else
+# define nsvp_HAVE_TWEAK_HEADER  0
+//# pragma message("value_ptr.hpp: Note: Tweak header not supported.")
+#endif
+
 // value-ptr-lite configuration:
 
 #ifndef  nsvp_CONFIG_COMPARE_POINTERS

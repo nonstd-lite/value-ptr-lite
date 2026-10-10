@@ -1193,6 +1193,15 @@ CASE( "std::hash<>: Allows to obtain hash (C++11)" )
 #endif
 }
 
+CASE( "tweak header: reads tweak header if supported " "[tweak]" )
+{
+#if nsvp_HAVE_TWEAK_HEADER
+    EXPECT( VALUE_PTR_TWEAK_VALUE == 42 );
+#else
+    EXPECT( !!"Tweak header is not available (nsvp_HAVE_TWEAK_HEADER: 0)." );
+#endif
+}
+
 //------------------------------------------------------------------------
 // Applets:
 

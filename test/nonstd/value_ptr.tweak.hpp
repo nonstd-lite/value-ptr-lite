@@ -1,0 +1,1 @@
+#define VALUE_PTR_TWEAK_VALUE 42

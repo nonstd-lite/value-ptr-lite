@@ -18,6 +18,7 @@
       - [Class `value_ptr`](#class-value_ptr)
     - [Non-member functions for *value-ptr lite*](#non-member-functions-for-value-ptr-lite)
     - [Configuration macros](#configuration-macros)
+      - [Tweak header](#tweak-header)
       - [Standard selection macro](#standard-selection-macro)
       - [Compare pointers](#compare-pointers)
       - [Disable exceptions](#disable-exceptions)
@@ -199,15 +200,22 @@ Synopsis
 
 ### Configuration macros
 
+#### Tweak header
+
+If the compiler supports [`__has_include()`](https://en.cppreference.com/w/cpp/preprocessor/include), *value_ptr lite* supports the [tweak header](https://vector-of-bool.github.io/2020/10/04/lib-configuration.html) mechanism. Provide your *tweak header* as `nonstd/value_ptr.tweak.hpp` in a folder in the include-search-path. In the tweak header, provide definitions as documented below, like `#define nsvp_CPLUSPLUS 201103L`.
+
 #### Standard selection macro
+
 -D<b>nsvp\_CPLUSPLUS</b>=199711L  
 Define this macro to override the auto-detection of the supported C++ standard, if your compiler does not set the `__cpluplus` macro correctly.
 
 #### Compare pointers
+
 -D<b>nsvp_CONFIG_COMPARE_POINTERS</b>=0  
 Define this to 1 to compare `value_ptr`'s pointer instead of the content it's pointing to. Default is 0.
 
 #### Disable exceptions
+
 -D<b>nsvp_CONFIG_NO_EXCEPTIONS</b>=0  
 Define this to 1 if you want to compile without exceptions. If not defined, the header tries and detect if exceptions have been disabled (e.g. via `-fno-exceptions`). Default is undefined.
 

@@ -6,32 +6,18 @@
 
 
 **Contents**
-- [value-ptr lite: A C++ smart-pointer with value semantics for C++98, C++11 and later](#value-ptr-lite-a-c-smart-pointer-with-value-semantics-for-c98-c11-and-later)
-  - [Pimpl example usage](#pimpl-example-usage)
-  - [In a nutshell](#in-a-nutshell)
-  - [License](#license)
-  - [Dependencies](#dependencies)
-  - [Installation](#installation)
-  - [Synopsis](#synopsis)
-    - [Types in namespace nonstd](#types-in-namespace-nonstd)
-    - [Interface of *value-ptr lite*](#interface-of-value-ptr-lite)
-      - [Class `value_ptr`](#class-value_ptr)
-    - [Non-member functions for *value-ptr lite*](#non-member-functions-for-value-ptr-lite)
-    - [Configuration macros](#configuration-macros)
-      - [Tweak header](#tweak-header)
-      - [Standard selection macro](#standard-selection-macro)
-      - [Compare pointers](#compare-pointers)
-      - [Disable exceptions](#disable-exceptions)
-  - [Reported to work with](#reported-to-work-with)
-  - [Building tests and examples](#building-tests-and-examples)
-    - [Buck](#buck)
-    - [CMake](#cmake)
-  - [Other value-ptr implementations](#other-value-ptr-implementations)
-  - [Notes and references](#notes-and-references)
-  - [Appendix](#appendix)
-    - [A.1 Compile-time information](#a1-compile-time-information)
-    - [A.2 Value-ptr lite test specification](#a2-value-ptr-lite-test-specification)
 
+- [Pimpl example usage](#pimpl-example-usage)
+- [In a nutshell](#in-a-nutshell)
+- [License](#license)
+- [Dependencies](#dependencies)
+- [Installation](#installation)
+- [Synopsis](#synopsis)
+- [Reported to work with](#reported-to-work-with)
+- [Building tests and examples](#building-tests-and-examples)
+- [Other value-ptr implementations](#other-value-ptr-implementations)
+- [Notes and references](#notes-and-references)
+- [Appendix](#appendix)
 
 Pimpl example usage
 -------------------
